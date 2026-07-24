@@ -113,7 +113,7 @@ async function renderDoc(slug, anchor) {
     pendingBlock = null;
   }
   if (anchor) setTimeout(() => scrollToAnchor(anchor), 80);
-  else main.scrollTo(0, 0);
+  else main.scrollTo?.(0, 0);
 }
 
 function crumbs(slug, page) {
