@@ -444,6 +444,14 @@ table.codelines tr.focus .ln { color: var(--green); }
 table.codelines tr.has-anno .ln::before { content: '●'; color: var(--amber); position: absolute; left: 1px; font-size: 9px; }
 table.codelines tr.selrange { background: rgba(52, 255, 94, 0.07); }
 
+.def-blurb { color: var(--fg-dim); font-family: var(--font-body); font-size: 13px; padding: 0 2px 14px; border-bottom: 1px solid var(--rule); margin-bottom: 6px; }
+.tier-label { font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin: 18px 0 8px; text-shadow: var(--glow); }
+.src-anno-bar { display: flex; gap: 8px; padding: 8px 10px; border-top: 1px solid var(--rule); background: var(--surface); align-items: center; }
+.src-anno-bar .hint { color: var(--fg-faint); font-size: 11px; margin-right: auto; }
+.src-threads:not(:empty) { border: 1px solid var(--rule-2); border-top: none; padding: 4px 10px 10px; background: var(--bg); }
+.src-threads .thread { padding-top: 10px; }
+.drift-chip { color: var(--amber); border: 1px solid rgba(255, 180, 84, 0.4); font-size: 10px; padding: 0 5px; margin-left: 8px; }
+
 /* ============================ board ============================ */
 .board { padding: 20px 24px 60px; height: 100%; overflow: auto; }
 .board-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }

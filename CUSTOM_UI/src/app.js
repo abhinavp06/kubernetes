@@ -5,7 +5,7 @@ import { getState, setStatic, refresh, subscribe, docThreads, allCodeThreads, th
 import { renderNav, setNavigate } from './nav.js';
 import { initPalette } from './palette.js';
 import { initDocAnnotations, renderDocMarkers, openBlock, setChangeHook, closeDrawer } from './threads.js';
-import { renderDefinition } from './code.js';
+import { renderDefinition, openConcept, setCodeChangeHook } from './code.js';
 import { renderBoard } from './board.js';
 import { renderAtoms } from './atoms.js';
 
@@ -211,7 +211,7 @@ function renderNotes(main) {
               pendingBlock = { slug: t.target.slug, blockIndex: t.target.blockIndex };
               navigate('#/' + t.target.slug);
             } else {
-              toast('open the Deployment/Pod/Service page to view code threads');
+              openConcept(t.target.openedFrom, { path: t.target.path, line: t.target.lineStart });
             }
           },
         },
@@ -351,11 +351,13 @@ async function boot() {
   await refresh();
 
   setNavigate(navigate);
-  setChangeHook(() => {
+  const onChange = () => {
     if (current.view === 'doc' && current.slug) renderDocMarkers(current.slug);
     renderNav(current.slug, current.view === 'doc' ? null : '__' + current.view);
     updateStats();
-  });
+  };
+  setChangeHook(onChange);
+  setCodeChangeHook(onChange);
   initPalette(navigate);
   initGlobal();
   renderStatusBar();
