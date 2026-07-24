@@ -50,8 +50,10 @@ Environment (both optional — sensible defaults):
   drawer. Select a line range in the code drawer to annotate the **source** itself; code
   threads show a `~drifted` badge if the source no longer matches the quoted lines.
 - **Board** — `#__board` kanban (TO-LEARN / IN-PROGRESS / DOUBTS / DONE) with drag-and-drop
-  and link chips back to the doc or the source. A `→ board` action on any annotation captures
-  it as a linked DOUBTS card.
+  and link chips back to the doc or the source. **Every annotation is auto-mirrored to a linked
+  DOUBTS card** — annotating or commenting anywhere lands a card on the board automatically; it
+  stays in sync as you comment and is removed when you delete the thread. (You can still add
+  cards by hand per column.)
 - **Atomic Units map** — `#__atoms` lists every core object and where it lives in the tree,
   `kubectl get` style; click a Kind or a location to jump into the code.
 

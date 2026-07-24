@@ -1,6 +1,6 @@
 // Kanban learning board: columns, drag-and-drop, card CRUD, and deep-link chips
 // back to the doc paragraph or the source definition a card came from.
-import { el, mdInline, toast } from './util.js';
+import { el, mdInline } from './util.js';
 import { api } from './api.js';
 import { getState, refresh } from './store.js';
 import { openConcept } from './code.js';
@@ -100,10 +100,4 @@ function editCard(c, card, main) {
   const save = async () => { await api.updateCard(c.id, { title: title.value.trim(), body: body.value.trim(), type: type.value }); await refresh(); rerender(main); };
   card.innerHTML = '';
   card.append(title, body, el('div', { style: 'display:flex;gap:6px;margin-top:6px;align-items:center' }, type, el('button', { class: 'btn-green', onclick: save }, 'save'), el('button', { onclick: () => rerender(main) }, 'cancel')));
-}
-
-// Capture helper used by the annotation drawer / selection pill.
-export async function captureToBoard({ title, body, link }) {
-  await api.createCard({ title: (title || 'doubt').slice(0, 80), body: body || '', column: 'doubt', type: 'doubt', link: link || null });
-  toast('added to board · DOUBTS');
 }

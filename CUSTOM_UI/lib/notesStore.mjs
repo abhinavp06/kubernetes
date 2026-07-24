@@ -45,6 +45,7 @@ export function createThread({ target, quote, body }) {
   }
   threads.push(thread);
   setThreads(threads);
+  upsertCardForThread(thread);
   return thread;
 }
 
@@ -57,6 +58,7 @@ export function addComment(threadId, body) {
   t.comments.push(c);
   t.updatedAt = now;
   setThreads(threads);
+  upsertCardForThread(t);
   return t;
 }
 
@@ -70,6 +72,7 @@ export function editComment(threadId, commentId, body) {
   c.updatedAt = Date.now();
   t.updatedAt = c.updatedAt;
   setThreads(threads);
+  upsertCardForThread(t);
   return t;
 }
 
@@ -79,14 +82,18 @@ export function deleteComment(threadId, commentId) {
   if (!t) return null;
   t.comments = t.comments.filter((x) => x.id !== commentId);
   t.updatedAt = Date.now();
-  // prune empty threads
-  if (t.comments.length === 0) threads = threads.filter((x) => x.id !== threadId);
+  // prune empty threads (unless they carry a quote, e.g. a bare code annotation)
+  const prune = t.comments.length === 0 && !t.quote;
+  if (prune) threads = threads.filter((x) => x.id !== threadId);
   setThreads(threads);
-  return { pruned: t.comments.length === 0 };
+  if (prune) removeCardForThread(threadId);
+  else upsertCardForThread(t);
+  return { pruned: prune };
 }
 
 export function deleteThread(threadId) {
   setThreads(getThreads().filter((x) => x.id !== threadId));
+  removeCardForThread(threadId);
   return { ok: true };
 }
 
@@ -171,6 +178,44 @@ export function deleteCard(id) {
   board.cards = board.cards.filter((x) => x.id !== id);
   setBoard(board);
   return { ok: true };
+}
+
+// ---------------- thread → board mirror ----------------
+// Every annotation thread is mirrored to a linked DOUBTS card so it lands on the board
+// automatically. The card tracks the thread (title = quoted passage, body = its comments)
+// and is removed when the thread is deleted or pruned.
+function upsertCardForThread(thread) {
+  const board = getBoard();
+  const title = (thread.quote || (thread.comments[0] && thread.comments[0].body) || 'annotation').slice(0, 90);
+  const body = thread.comments.map((c) => c.body).filter(Boolean).join('\n\n');
+  const link = thread.target.kind === 'doc'
+    ? { threadId: thread.id, docSlug: thread.target.slug, blockIndex: thread.target.blockIndex }
+    : { threadId: thread.id, codeAnchor: { slug: thread.target.openedFrom, path: thread.target.path, line: thread.target.lineStart } };
+  const now = Date.now();
+  let card = board.cards.find((c) => c.link && c.link.threadId === thread.id);
+  if (card) {
+    card.title = title;
+    card.body = body;
+    card.link = link;
+    card.updatedAt = now;
+  } else {
+    const column = 'doubt';
+    board.cards.push({
+      id: uid(), title, body, column, type: 'doubt', link, auto: true,
+      order: board.cards.filter((c) => c.column === column).length,
+      createdAt: now, updatedAt: now,
+    });
+  }
+  setBoard(board);
+}
+
+function removeCardForThread(threadId) {
+  const board = getBoard();
+  const kept = board.cards.filter((c) => !(c.link && c.link.threadId === threadId));
+  if (kept.length !== board.cards.length) {
+    board.cards = kept;
+    setBoard(board);
+  }
 }
 
 // ---------------- aggregate ----------------
