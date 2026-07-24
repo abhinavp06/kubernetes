@@ -380,6 +380,8 @@ textarea, input.txt {
   border: 1px solid var(--rule); padding: 8px 10px; width: 100%; resize: vertical;
 }
 textarea:focus, input.txt:focus { border-color: var(--green); outline: none; box-shadow: var(--glow); }
+select.txt { font-family: var(--font-mono); font-size: 12px; background: #060806; color: var(--fg); border: 1px solid var(--rule); padding: 4px 6px; }
+select.txt:focus { border-color: var(--green); outline: none; }
 .composer .row { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
 .composer .hint { color: var(--fg-faint); font-size: 11px; margin-right: auto; }
 .btn-green { border-color: var(--green); color: var(--green); }

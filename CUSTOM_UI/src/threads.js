@@ -1,9 +1,20 @@
 // Annotation threads + the right-hand drawer. Target-agnostic: the same thread UI serves
 // doc-block annotations and source-code line ranges. The drawer can also host arbitrary
 // content (used by the code view) via openCustomDrawer.
-import { el, esc, mdInline, timeAgo } from './util.js';
+import { el, esc, mdInline, timeAgo, toast } from './util.js';
 import { api } from './api.js';
 import { refresh, docThreads } from './store.js';
+
+// Capture an annotation onto the board as a DOUBTS card, linked back to its anchor.
+async function captureThread(t) {
+  const link = t.target.kind === 'doc'
+    ? { docSlug: t.target.slug }
+    : { codeAnchor: { slug: t.target.openedFrom, path: t.target.path, line: t.target.lineStart } };
+  const title = (t.quote || (t.comments[0] && t.comments[0].body) || 'annotation').slice(0, 80);
+  await api.createCard({ title, body: t.comments.map((c) => c.body).join('\n'), column: 'doubt', type: 'doubt', link });
+  changeHook();
+  toast('added to board · DOUBTS');
+}
 
 let drawerEl = null;
 let overlayEl = null;
@@ -83,6 +94,7 @@ function threadCard(t, config) {
   wrap.append(el('div', { class: 'composer' }, ta,
     el('div', { class: 'row' },
       el('span', { class: 'hint' }, '⌘/Ctrl+Enter'),
+      el('button', { onclick: () => captureThread(t) }, '→ board'),
       el('button', { class: 'btn-danger', onclick: () => delThread(t, config) }, 'delete thread'),
       el('button', { class: 'btn-green', onclick: submit }, 'comment'))));
   return wrap;
@@ -204,7 +216,10 @@ function initSelectionPill(slug, article) {
       if (!node || node === article) return;
       const blockIndex = Number(node.dataset.block);
       const rect = range.getBoundingClientRect();
-      pill = el('div', { class: 'sel-pill', onclick: () => { clear(); openBlock(slug, blockIndex, text.replace(/\s+/g, ' ').slice(0, 160)); } }, '✎ Annotate selection');
+      const quote = text.replace(/\s+/g, ' ').slice(0, 160);
+      pill = el('div', { class: 'sel-pill' },
+        el('span', { style: 'cursor:pointer', onclick: () => { clear(); openBlock(slug, blockIndex, quote); } }, '✎ annotate'),
+        el('span', { style: 'cursor:pointer;color:var(--fg-dim);border-left:1px solid var(--rule);padding-left:6px', onclick: async () => { clear(); await api.createCard({ title: quote.slice(0, 80), body: '', column: 'doubt', type: 'doubt', link: { docSlug: slug } }); changeHook(); toast('added to board · DOUBTS'); } }, '→ board'));
       pill.style.left = rect.left + rect.width / 2 + 'px';
       pill.style.top = rect.top + 'px';
       document.body.append(pill);
