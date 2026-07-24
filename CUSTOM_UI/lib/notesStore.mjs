@@ -1,0 +1,179 @@
+// Disk-backed JSON store for threads, notes, and the kanban board.
+// Atomic writes (temp file + rename); plain JSON so it can be read/edited by hand.
+import fs from 'node:fs';
+import path from 'node:path';
+import { NOTES_DIR } from '../config.mjs';
+
+fs.mkdirSync(NOTES_DIR, { recursive: true });
+
+const fileOf = (name) => path.join(NOTES_DIR, name);
+
+function load(name, fallback) {
+  try {
+    return JSON.parse(fs.readFileSync(fileOf(name), 'utf8'));
+  } catch {
+    return fallback;
+  }
+}
+
+function save(name, data) {
+  const dest = fileOf(name);
+  const tmp = dest + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+  fs.renameSync(tmp, dest);
+}
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+// ---------------- threads ----------------
+export const getThreads = () => load('threads.json', []);
+const setThreads = (t) => save('threads.json', t);
+
+export function createThread({ target, quote, body }) {
+  const threads = getThreads();
+  const now = Date.now();
+  const thread = {
+    id: uid(),
+    target,
+    quote: quote || '',
+    createdAt: now,
+    updatedAt: now,
+    comments: [],
+  };
+  if (body && body.trim()) {
+    thread.comments.push({ id: uid(), body: body.trim(), createdAt: now, updatedAt: now });
+  }
+  threads.push(thread);
+  setThreads(threads);
+  return thread;
+}
+
+export function addComment(threadId, body) {
+  const threads = getThreads();
+  const t = threads.find((x) => x.id === threadId);
+  if (!t) return null;
+  const now = Date.now();
+  const c = { id: uid(), body: (body || '').trim(), createdAt: now, updatedAt: now };
+  t.comments.push(c);
+  t.updatedAt = now;
+  setThreads(threads);
+  return t;
+}
+
+export function editComment(threadId, commentId, body) {
+  const threads = getThreads();
+  const t = threads.find((x) => x.id === threadId);
+  if (!t) return null;
+  const c = t.comments.find((x) => x.id === commentId);
+  if (!c) return null;
+  c.body = (body || '').trim();
+  c.updatedAt = Date.now();
+  t.updatedAt = c.updatedAt;
+  setThreads(threads);
+  return t;
+}
+
+export function deleteComment(threadId, commentId) {
+  let threads = getThreads();
+  const t = threads.find((x) => x.id === threadId);
+  if (!t) return null;
+  t.comments = t.comments.filter((x) => x.id !== commentId);
+  t.updatedAt = Date.now();
+  // prune empty threads
+  if (t.comments.length === 0) threads = threads.filter((x) => x.id !== threadId);
+  setThreads(threads);
+  return { pruned: t.comments.length === 0 };
+}
+
+export function deleteThread(threadId) {
+  setThreads(getThreads().filter((x) => x.id !== threadId));
+  return { ok: true };
+}
+
+// ---------------- notes ----------------
+export const getNotes = () => load('notes.json', []);
+const setNotes = (n) => save('notes.json', n);
+
+export function createNote({ title, body }) {
+  const notes = getNotes();
+  const now = Date.now();
+  const note = { id: uid(), title: title || 'Untitled', body: body || '', createdAt: now, updatedAt: now };
+  notes.unshift(note);
+  setNotes(notes);
+  return note;
+}
+
+export function updateNote(id, patch) {
+  const notes = getNotes();
+  const n = notes.find((x) => x.id === id);
+  if (!n) return null;
+  if (patch.title != null) n.title = patch.title;
+  if (patch.body != null) n.body = patch.body;
+  n.updatedAt = Date.now();
+  setNotes(notes);
+  return n;
+}
+
+export function deleteNote(id) {
+  setNotes(getNotes().filter((x) => x.id !== id));
+  return { ok: true };
+}
+
+// ---------------- board ----------------
+const DEFAULT_BOARD = {
+  columns: [
+    { id: 'learn', title: 'TO-LEARN', mark: '[ ]' },
+    { id: 'doing', title: 'IN-PROGRESS', mark: '[~]' },
+    { id: 'doubt', title: 'DOUBTS', mark: '[?]' },
+    { id: 'done', title: 'DONE', mark: '[x]' },
+  ],
+  cards: [],
+};
+
+export const getBoard = () => load('board.json', DEFAULT_BOARD);
+const setBoard = (b) => save('board.json', b);
+
+export function createCard({ title, body, column, type, link }) {
+  const board = getBoard();
+  const now = Date.now();
+  const col = board.columns.find((c) => c.id === column) ? column : 'doubt';
+  const order = board.cards.filter((c) => c.column === col).length;
+  const card = {
+    id: uid(),
+    title: title || 'Untitled',
+    body: body || '',
+    column: col,
+    type: type || 'todo',
+    link: link || null,
+    order,
+    createdAt: now,
+    updatedAt: now,
+  };
+  board.cards.push(card);
+  setBoard(board);
+  return card;
+}
+
+export function updateCard(id, patch) {
+  const board = getBoard();
+  const c = board.cards.find((x) => x.id === id);
+  if (!c) return null;
+  for (const k of ['title', 'body', 'column', 'type', 'order', 'link']) {
+    if (patch[k] !== undefined) c[k] = patch[k];
+  }
+  c.updatedAt = Date.now();
+  setBoard(board);
+  return c;
+}
+
+export function deleteCard(id) {
+  const board = getBoard();
+  board.cards = board.cards.filter((x) => x.id !== id);
+  setBoard(board);
+  return { ok: true };
+}
+
+// ---------------- aggregate ----------------
+export function getState() {
+  return { threads: getThreads(), notes: getNotes(), board: getBoard() };
+}
