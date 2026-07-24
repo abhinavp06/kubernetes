@@ -26,6 +26,32 @@ md.use(anchor, {
   permalink: anchor.permalink.linkInsideHeader({ symbol: '#', placement: 'after' }),
 });
 
+// Hugo/Goldmark explicit heading IDs: `## Heading {#custom-id}` (also strips `{.class}`).
+// Runs after markdown-it-anchor so it overrides the auto slug with the authored id and
+// repoints the permalink — otherwise the `{#id}` leaks as literal heading text.
+md.core.ruler.push('custom_heading_ids', (state) => {
+  const tokens = state.tokens;
+  for (let i = 0; i < tokens.length - 1; i++) {
+    if (tokens[i].type !== 'heading_open') continue;
+    const inline = tokens[i + 1];
+    if (!inline || inline.type !== 'inline' || !inline.children) continue;
+    for (const child of inline.children) {
+      if (child.type !== 'text') continue;
+      const m = child.content.match(/\s*\{([#.][^}]*)\}\s*$/);
+      if (!m) continue;
+      child.content = child.content.slice(0, child.content.length - m[0].length).replace(/\s+$/, '');
+      const idMatch = m[1].match(/#([\w-]+)/);
+      if (idMatch) {
+        tokens[i].attrSet('id', idMatch[1]);
+        for (const c of inline.children) {
+          if (c.type === 'link_open' && (c.attrGet('href') || '').startsWith('#')) c.attrSet('href', '#' + idMatch[1]);
+        }
+      }
+      break;
+    }
+  }
+});
+
 // Custom fence renderer: language label + copy button + highlight.js output.
 md.renderer.rules.fence = (tokens, idx) => {
   const token = tokens[idx];
