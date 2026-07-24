@@ -1,0 +1,21 @@
+# systemd unit for the Control Plane server (installed at /etc/systemd/system/).
+# Install:  sudo cp control-plane.service /etc/systemd/system/ && sudo systemctl daemon-reload \
+#           && sudo systemctl enable --now control-plane
+# Paths are absolute for this workspace (/root/KUBERNETES); adjust if the repo moves.
+[Unit]
+Description=Control Plane - Kubernetes docs to source reader (CUSTOM_UI)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/KUBERNETES/kubernetes/CUSTOM_UI
+Environment=PORT=4173
+Environment=CODE_ROOT=/root/KUBERNETES/kubernetes
+Environment=DOCS_ROOT=/root/KUBERNETES/k8s-website/content/en
+ExecStart=/usr/bin/node /root/KUBERNETES/kubernetes/CUSTOM_UI/server/serve.mjs
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

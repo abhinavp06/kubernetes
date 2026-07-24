@@ -47,12 +47,15 @@ Repo is ~1.19 GiB, so negotiation is slow — give the push a long timeout.
 - `data/` (gitignored, generated), `notes/` (gitignored, user data).
 
 ## Conventions & gotchas
-- **Server-side edits** (`lib/`, `server/`) need a **server restart** (module cache). **Client edits**
-  (`src/`) are served fresh per request — no restart.
-- Start the server with an **absolute path** (cwd varies between calls):
-  `node /root/KUBERNETES/kubernetes/CUSTOM_UI/server/serve.mjs`.
-  Stop it via `pgrep -f '[s]erve\.mjs'` (the `[s]` bracket avoids the pkill self-match that killed
-  the shell before — never `pkill -f serve.mjs`).
+- The server runs as a **systemd service** `control-plane` (enabled, `Restart=always`) on :4173 —
+  it is NOT tied to a shell/Claude session. Manage it: `systemctl {status,restart,stop,start}
+  control-plane`; logs: `journalctl -u control-plane -f`. Unit is version-controlled at
+  `control-plane.service` (installed to `/etc/systemd/system/`).
+- **Server-side edits** (`lib/`, `server/`) need `systemctl restart control-plane` (Node caches
+  loaded modules). **Client edits** (`src/`) are served fresh per request — no restart.
+- Manual fallback (no systemd): start with an **absolute path** (cwd varies):
+  `node /root/KUBERNETES/kubernetes/CUSTOM_UI/server/serve.mjs`; stop via `pkill -f '[s]erve\.mjs'`
+  (the `[s]` bracket avoids the self-match that killed the shell before — never `pkill -f serve.mjs`).
 - **Theme = PHOSPHOR:** black/white/phosphor-green; Space Mono (display) / JetBrains Mono (UI+code) /
   IBM Plex Sans (body); square corners, hairline rules, blinking-cursor wordmark, ANSI-styled code.
   Keep new UI on-theme.
@@ -63,10 +66,12 @@ Repo is ~1.19 GiB, so negotiation is slow — give the push a long timeout.
 - Watch for stray NUL bytes if a template-literal edit ever looks off (bit us once); `grep -aP '\x00'`.
 
 ## Run / verify
+The server normally runs as the `control-plane` systemd service (see gotchas), so you don't start
+it by hand — after a server-side edit, `systemctl restart control-plane`.
 ```
-npm run dev     # build + serve → http://localhost:4173
-npm run build   # rebuild data/ only
-npm run smoke   # jsdom smoke test (server must be running)
+npm run build   # rebuild data/ only (then restart the service if lib/server changed)
+npm run smoke   # jsdom smoke test (service must be up)
+npm run dev     # manual: build + foreground serve → http://localhost:4173 (fallback only)
 ```
 
 ## Status / next
