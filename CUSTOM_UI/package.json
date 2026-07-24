@@ -1,0 +1,18 @@
+{
+  "name": "control-plane",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Control Plane — a terminal-native reader linking Kubernetes docs to the source definitions of core components.",
+  "scripts": {
+    "build": "node build/build.mjs",
+    "serve": "node server/serve.mjs",
+    "dev": "node build/build.mjs && node server/serve.mjs"
+  },
+  "dependencies": {
+    "highlight.js": "^11.9.0",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.0.1"
+  }
+}
