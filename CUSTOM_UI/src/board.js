@@ -68,9 +68,14 @@ function cardEl(c, main) {
     if (c.link.codeAnchor) chips.append(el('span', { class: 'chip', title: 'open the source', onclick: () => openConcept(c.link.codeAnchor.slug, { path: c.link.codeAnchor.path, line: c.link.codeAnchor.line }) }, '↳ ' + basename(c.link.codeAnchor.path)));
     if (chips.children.length) card.append(chips);
   }
-  card.append(el('div', { class: 'cardactions' },
-    el('button', { onclick: (e) => { e.stopPropagation(); editCard(c, card, main); } }, 'edit'),
-    el('button', { onclick: async (e) => { e.stopPropagation(); await api.deleteCard(c.id); await refresh(); rerender(main); } }, 'delete')));
+  if (c.auto || (c.link && c.link.threadId)) {
+    // Annotation-linked cards are managed by their thread — removed only when it is deleted.
+    card.append(el('div', { class: 'cardmeta', title: 'delete the annotation to remove this' }, '↳ from annotation'));
+  } else {
+    card.append(el('div', { class: 'cardactions' },
+      el('button', { class: 'icon', title: 'edit', onclick: (e) => { e.stopPropagation(); editCard(c, card, main); } }, '✎'),
+      el('button', { class: 'icon', title: 'delete', onclick: async (e) => { e.stopPropagation(); await api.deleteCard(c.id); await refresh(); rerender(main); } }, '✕')));
+  }
   return card;
 }
 

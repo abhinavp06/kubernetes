@@ -175,6 +175,11 @@ export function updateCard(id, patch) {
 
 export function deleteCard(id) {
   const board = getBoard();
+  const card = board.cards.find((x) => x.id === id);
+  // Annotation-linked cards can only be removed by deleting their thread.
+  if (card && (card.auto || (card.link && card.link.threadId))) {
+    return { ok: false, reason: 'linked to an annotation; delete the thread instead' };
+  }
   board.cards = board.cards.filter((x) => x.id !== id);
   setBoard(board);
   return { ok: true };

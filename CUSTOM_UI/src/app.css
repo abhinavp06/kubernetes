@@ -486,6 +486,16 @@ table.codelines tr.selrange { background: rgba(52, 255, 94, 0.07); }
 .card:hover .cardactions { opacity: 1; }
 .card .cardactions button { border: none; padding: 0; font-size: 11px; color: var(--fg-faint); background: none; }
 .card .cardactions button:hover { color: var(--green); }
+.card .cardmeta { color: var(--fg-faint); font-size: 10px; margin-top: 6px; font-family: var(--font-mono); opacity: 0.8; }
+
+/* icon buttons (edit ✎ / delete ✕) — legible glyphs, override the 11px action sizing */
+.comment .meta .actions button.icon,
+.note-item .n-actions button.icon,
+.card .cardactions button.icon { font-size: 15px; line-height: 1; padding: 0 3px; }
+.comment .meta .actions button.icon:hover,
+.note-item .n-actions button.icon:hover { color: var(--green); }
+.card .cardactions button.icon[title="delete"]:hover,
+.comment .meta .actions button.icon[title="delete"]:hover { color: var(--danger); }
 
 /* ============================ atoms map ============================ */
 .atoms { padding: 24px 32px 80px; max-width: 1000px; margin: 0 auto; overflow: auto; height: 100%; }

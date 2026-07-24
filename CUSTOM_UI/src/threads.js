@@ -83,7 +83,7 @@ function threadCard(t, config) {
   wrap.append(el('div', { class: 'composer' }, ta,
     el('div', { class: 'row' },
       el('span', { class: 'hint' }, '⌘/Ctrl+Enter · on board'),
-      el('button', { class: 'btn-danger', onclick: () => delThread(t, config) }, 'delete thread'),
+      el('button', { class: 'btn-danger', title: 'delete thread', onclick: () => delThread(t, config) }, '✕ thread'),
       el('button', { class: 'btn-green', onclick: submit }, 'comment'))));
   return wrap;
 }
@@ -94,8 +94,8 @@ function commentEl(t, c, config) {
     el('div', { class: 'meta' },
       el('span', {}, timeAgo(c.updatedAt || c.createdAt)),
       el('div', { class: 'actions' },
-        el('button', { onclick: startEdit }, 'edit'),
-        el('button', { onclick: del }, 'delete'))),
+        el('button', { class: 'icon', title: 'edit', onclick: startEdit }, '✎'),
+        el('button', { class: 'icon', title: 'delete', onclick: del }, '✕'))),
     bodyEl);
 
   function startEdit() {

@@ -255,8 +255,8 @@ function noteItem(n, setTab) {
       el('div', { class: 'n-body', html: mdInline(n.body) }),
       el('div', { class: 'n-actions' },
         el('span', { style: 'color:var(--fg-faint);font-size:11px' }, timeAgo(n.updatedAt)),
-        el('button', { onclick: edit }, 'edit'),
-        el('button', { onclick: del }, 'delete')));
+        el('button', { class: 'icon', title: 'edit', onclick: edit }, '✎'),
+        el('button', { class: 'icon', title: 'delete', onclick: del }, '✕')));
   };
   function edit() {
     const title = el('input', { class: 'txt' }); title.value = n.title;
