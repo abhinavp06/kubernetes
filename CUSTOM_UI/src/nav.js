@@ -51,5 +51,6 @@ export function renderNav(activeSlug, activeView) {
   ws.append(wsItem('__atoms', '⎔', 'Atomic Units', (manifest.concepts || []).length));
   ws.append(wsItem('__notes', '✎', 'Notes', threadCount() + noteCount()));
   ws.append(wsItem('__board', '▤', 'Board', cardCount()));
+  ws.append(wsItem('__graph', '◈', 'Knowledge Graph', (st.graph && st.graph.nodes.length) || 0));
   nav.append(ws);
 }

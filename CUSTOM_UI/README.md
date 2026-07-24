@@ -56,6 +56,11 @@ Environment (both optional — sensible defaults):
   cards by hand per column.)
 - **Atomic Units map** — `#__atoms` lists every core object and where it lives in the tree,
   `kubectl get` style; click a Kind or a location to jump into the code.
+- **Knowledge graph** — `#__graph` builds an interactive force-directed concept graph from your
+  notes + annotations via the local `claude` agent (`⟳ analyze notes with local agent`). Drag
+  nodes, scroll to zoom, pan, hover to highlight, click for detail. Requires the `claude` CLI on
+  PATH; the graph is validated (dangling links dropped, weights clamped 1–5) and saved to
+  `notes/graph.json`.
 
 Everything degrades gracefully if the API server is offline (the reader still works; the
 notes/board features simply disable).

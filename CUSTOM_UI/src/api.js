@@ -29,6 +29,9 @@ export const api = {
   createCard: (c) => req('POST', '/api/board/cards', c),
   updateCard: (id, patch) => req('PATCH', `/api/board/cards/${id}`, patch),
   deleteCard: (id) => req('DELETE', `/api/board/cards/${id}`),
+
+  analyze: () => req('POST', '/api/analyze'),
+  analyzeStatus: () => req('GET', '/api/analyze/status'),
 };
 
 export async function loadManifest() {

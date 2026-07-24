@@ -49,6 +49,7 @@ function commands() {
     { kind: 'view', label: 'Atomic Units map', sub: '⎔', action: () => navigate('#__atoms'), keys: 'atoms atomic units components map' },
     { kind: 'view', label: 'Notes & annotations', sub: '✎', action: () => navigate('#__notes'), keys: 'notes annotations' },
     { kind: 'view', label: 'Kanban board', sub: '▤', action: () => navigate('#__board'), keys: 'board kanban doubts todo' },
+    { kind: 'view', label: 'Knowledge graph', sub: '◈', action: () => navigate('#__graph'), keys: 'graph knowledge concept map agent' },
   ];
 }
 

@@ -7,6 +7,7 @@ import hljs from 'highlight.js';
 
 import { SRC_DIR, DATA_DIR, STATIC_DIR, CODE_ROOT, PORT } from '../config.mjs';
 import * as store from '../lib/notesStore.mjs';
+import { startAnalysis, getJob } from '../lib/analyze.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -114,8 +115,12 @@ async function handleApi(req, res, url) {
   const p = url.pathname;
   const method = req.method;
 
-  if (p === '/api/state' && method === 'GET') return json(res, 200, store.getState());
+  if (p === '/api/state' && method === 'GET') return json(res, 200, { ...store.getState(), analyze: getJob() });
   if (p === '/api/code' && method === 'GET') return handleCode(res, url);
+
+  // knowledge graph
+  if (p === '/api/analyze' && method === 'POST') return json(res, 202, startAnalysis());
+  if (p === '/api/analyze/status' && method === 'GET') return json(res, 200, getJob());
 
   // threads
   if (p === '/api/threads' && method === 'POST') {

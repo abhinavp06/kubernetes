@@ -223,7 +223,11 @@ function removeCardForThread(threadId) {
   }
 }
 
+// ---------------- knowledge graph ----------------
+export const getGraph = () => load('graph.json', { nodes: [], links: [] });
+export const setGraph = (g) => save('graph.json', g);
+
 // ---------------- aggregate ----------------
 export function getState() {
-  return { threads: getThreads(), notes: getNotes(), board: getBoard() };
+  return { threads: getThreads(), notes: getNotes(), board: getBoard(), graph: getGraph() };
 }

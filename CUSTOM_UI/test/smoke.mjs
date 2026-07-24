@@ -73,6 +73,14 @@ window.dispatchEvent(new window.HashChangeEvent('hashchange'));
 await wait(200);
 check('board columns', $$('.board-col').length === 4);
 
+// route to graph
+window.location.hash = '#__graph';
+window.dispatchEvent(new window.HashChangeEvent('hashchange'));
+await wait(200);
+check('graph view', $('.graph-view'));
+check('graph canvas', $('canvas.g-canvas'));
+check('analyze button', [...$$('.g-toolbar button')].some((b) => /analyze/i.test(b.textContent)));
+
 // route to notes
 window.location.hash = '#__notes';
 window.dispatchEvent(new window.HashChangeEvent('hashchange'));

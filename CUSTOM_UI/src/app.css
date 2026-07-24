@@ -534,6 +534,24 @@ table.codelines tr.selrange { background: rgba(52, 255, 94, 0.07); }
 .thread-ref .c { color: var(--fg-faint); font-size: 11px; }
 .thread-ref .tk { color: var(--amber); font-size: 10px; border: 1px solid rgba(255, 180, 84, 0.4); padding: 0 5px; }
 
+/* ============================ knowledge graph ============================ */
+.graph-view { display: flex; flex-direction: column; height: 100%; }
+.g-toolbar { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--rule); }
+.g-toolbar h1 { font-family: var(--font-display); color: var(--fg); font-size: 22px; margin: 0; }
+.g-toolbar h1 .prompt { color: var(--green); text-shadow: var(--glow); }
+.g-status { color: var(--fg-dim); font-size: 12px; }
+.g-stage { position: relative; flex: 1; overflow: hidden; }
+.g-canvas { position: absolute; inset: 0; display: block; }
+.g-legend { position: absolute; left: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(8, 11, 8, 0.7); border: 1px solid var(--rule); padding: 8px 10px; }
+.g-leg { display: flex; align-items: center; gap: 7px; color: var(--fg-dim); font-size: 11px; font-family: var(--font-mono); }
+.g-leg i, .g-d-head i { width: 9px; height: 9px; display: inline-block; border-radius: 50%; }
+.g-detail { position: absolute; right: 14px; top: 14px; width: 220px; background: var(--bg-2); border: 1px solid var(--green); box-shadow: var(--glow); padding: 12px; }
+.g-d-head { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); color: var(--fg); font-size: 14px; }
+.g-d-group { color: var(--amber); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin: 4px 0 10px; }
+.g-d-links { color: var(--fg-faint); font-size: 11px; margin-bottom: 4px; }
+.g-d-link { color: var(--green); font-size: 12px; padding: 2px 0; cursor: pointer; font-family: var(--font-mono); }
+.g-d-link:hover { text-decoration: underline; }
+
 /* misc */
 .empty { color: var(--fg-faint); text-align: center; padding: 40px; font-size: 13px; }
 .placeholder { max-width: var(--maxread); margin: 40px auto; padding: 32px; border: 1px dashed var(--rule); color: var(--fg-dim); text-align: center; }

@@ -8,6 +8,7 @@ import { initDocAnnotations, renderDocMarkers, openBlock, setChangeHook, closeDr
 import { renderDefinition, openConcept, setCodeChangeHook } from './code.js';
 import { renderBoard } from './board.js';
 import { renderAtoms } from './atoms.js';
+import { renderGraph } from './graph.js';
 
 let current = { view: 'home', slug: null };
 let pendingBlock = null; // {slug, blockIndex} to open after a doc renders
@@ -55,6 +56,7 @@ async function route() {
   if (r.view === 'doc') return renderDoc(r.slug, r.anchor);
   if (r.view === 'atoms') return showView('atoms', () => renderAtoms($('#main')));
   if (r.view === 'board') return showView('board', () => renderBoard($('#main')));
+  if (r.view === 'graph') return showView('graph', () => renderGraph($('#main')));
   if (r.view === 'notes') return showView('notes', () => renderNotes($('#main')));
   return navigate('#/' + homeSlug());
 }

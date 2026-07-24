@@ -7,6 +7,8 @@ const state = {
   threads: [],
   notes: [],
   board: { columns: [], cards: [] },
+  graph: { nodes: [], links: [] },
+  analyze: { running: false, error: null },
   manifest: null,
   codeMap: {},
 };
@@ -33,6 +35,8 @@ export async function refresh() {
     state.threads = s.threads || [];
     state.notes = s.notes || [];
     state.board = s.board || { columns: [], cards: [] };
+    state.graph = s.graph || { nodes: [], links: [] };
+    state.analyze = s.analyze || { running: false, error: null };
     state.online = true;
   } catch {
     state.online = false;
