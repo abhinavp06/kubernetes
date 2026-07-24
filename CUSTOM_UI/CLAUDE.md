@@ -18,6 +18,9 @@ MVP scope: **Pod · Deployment · Service** across all layers. Target Kubernetes
    change done, and extend it when adding a new view.
 4. **Autonomy:** assume "yes" on permissions, don't re-ask, work through multi-step tasks, ping when
    done.
+5. **Keep this CLAUDE.md (and `../CLAUDE.md`) current.** When the architecture, module layout,
+   conventions, workflow, or commands here change, update this file in the **same commit** as the
+   change.
 
 ## Pushing (auth quirk — important)
 The VS Code git credential socket goes stale as windows cycle. To push, retarget it to the newest
